@@ -1,0 +1,35 @@
+version: "3.0"
+#This file combines all the edge services and our services so that it can be deployed as a unit
+
+services:
+
+  opcua-simulator:
+    image: "predixedge/predix-edge-opcua-simulator:1.0.10"
+    networks:
+      - predix-edge-broker_net
+    ports:
+      - 4334:4334
+  opcua:
+    image: "dtr.predix.io/predix-edge/protocol-adapter-opcua:amd64-1.1.0"
+
+    environment:
+      config: "/config/config-opcua.json"
+    networks:
+      - predix-edge-broker_net
+  cloud_gateway:
+    image: "dtr.predix.io/predix-edge/cloud-gateway:amd64-1.1.0"
+    environment:
+      config: "/config/config-cloud-gateway.json"
+    env_file:
+      - /etc/environment
+    networks:
+      - predix-edge-broker_net
+  edge-app:
+    image: "predixedge/predix-edge-sample-scaler-cpp:1.0.2"
+    env_file:
+      - /etc/environment
+    networks:
+      - predix-edge-broker_net
+networks:
+  predix-edge-broker_net:
+    external: true
