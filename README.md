@@ -447,14 +447,22 @@ Now run the other containers of the application
 docker stack deploy --compose-file docker-compose-dev.yml my-edge-app
 ```
 
+The above steps can be executed using the shell script build_deploy_dev.sh under scripts directory. The script will create and configure necessary Predix Cloud services like UAA, Timeseries and also download the dependent images from artifactory and start the stack. 
+
+```bash
+./scripts/build_deploy_dev.sh --skip-setup
+```
+
 ##### Step 2: Start Your Application
 
-TODO
+Compile the application source files using make as below. This creates an executable app "scaler_app".
+
 ```bash
 make -f src/Makefile
 ```
 
-TODO
+Run the executable app to start the sample scaler.
+
 ```bash
 ./src/scaler_app
 ```
