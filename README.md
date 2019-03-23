@@ -183,9 +183,15 @@ To get started developing locally you will need to pull the core Predix Edge Doc
 
 Install the Predix Edge Broker
 
+Check the version of the Broker in the docker-compose-edge-broker.yml
+
+```bash
+cat docker-compose-edge-broker.yml
+```
+
 Using a browser, log in to https://artifactory.predix.io using your predix username and password.  GE users will use the SSO feature to login, use your SSO where it says your-predix-account below.  
 
-Click the `Artifacts` icon and navigate to the `predix-ext/predix-edge/<latest-version-here>/os` folder and `Download` the `edge-broker` container.
+Click the `Artifacts` icon and navigate to the `predix-ext/predix-edge/<edgeos-version-here>/os` folder and `Download` the `edge-broker` container version that matches the docker-compose-edge-broker.yml.
 
 **Changing the** command to use the **version** you downloaded, using a tool on your computer, untar it, e.g.
 
@@ -206,11 +212,18 @@ docker load -i *.tar
 ```
 
 Now repeat the steps for the OPCUA Adapter and Cloud Gateway
+
+Check the version of the OPCUA Adapter and Cloud Gateway in the docker-compose-local.yml
+
 ```bash
-predix-ext/predix-edge/<latest-version-here>/apps/adapters/<latest-opcua-adapter-here>
+cat docker-compose-edge-local.yml
+```
+
+```bash
+predix-ext/predix-edge/<edgeos-version-here>/apps/adapters/<opcua-adapter-version-here>
 ```
 ```bash
-predix-ext/predix-edge/<latest-version-here>/apps/gateway/<latest-cloud-gateway-here>
+predix-ext/predix-edge/<edgeos-version-here>/apps/gateway/<cloud-gateway-version-here>
 ```
 
 Finally, create a [Docker Swarm](https://docs.docker.com/engine/swarm/) on your machine.  You only need to do this once on your machine.  If you have done so in the past you can disregard this step.
@@ -375,7 +388,15 @@ This file is used by the Cloud Gateway service and contains properties indicatin
 
 ### Step 6. Run the App and Validate the Results
 
-#### Step 1: Get Access Token
+#### Step 1: Make data Dir Writeable
+
+First let's make the data dir writeable.  This is needed when running the app because the username inside the container does not match your username.
+
+```bash
+chmod 777 ./data
+```
+
+#### Step 2: Get Access Token
 
 The result of this app is to publish a scaled value to Predix Cloud Time Series.  In order to do so, the app requires a UAA token with permissions to ingest data.  On a Predix Edge device, apps obtain this token from the device once it is enrolled to Edge Manager.
 
@@ -384,10 +405,10 @@ During development, though, you must generate a token to be used by the app.  To
 The script takes three input parameters:
 - `my-client-id` - the client id for your instance of UAA: it must have permissions to ingest data into your Time Series instance
 - `my-secret` - the client secret for that client id
-- `my-uaa-url` - must be the full URL including the /oauth/token ending
+- `my-uaa-issuerid-url` - must be the full URL including the /oauth/token ending
 
 ```bash
-./scripts/get-access-token.sh my-client-id my-secret -my-uaa-url
+./scripts/get-access-token.sh my-client-id my-secret my-uaa-issuerid-url
 ```
 
 After you run the script, a file named *access_token* will be created in the data folder of the app.  The app is configured to use this file to obatin the token for transmitting data to the cloud.
